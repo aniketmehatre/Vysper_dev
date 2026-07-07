@@ -1,6 +1,7 @@
 export interface OcrResult {
   text: string;
   confidence: number;
+  processingTimeMs: number;
   boundingBoxes: OcrBoundingBox[];
 }
 

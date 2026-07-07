@@ -17,7 +17,10 @@ export const IPC_EVENTS = {
 
   // SQLite Database
   DB_EXECUTE: 'db:execute',
-  DB_QUERY: 'db:query'
+  DB_QUERY: 'db:query',
+
+  // Global Shortcuts
+  SHORTCUT_ACTIVATED: 'shortcut:activated'
 } as const;
 
 export type IpcChannel = typeof IPC_EVENTS[keyof typeof IPC_EVENTS];

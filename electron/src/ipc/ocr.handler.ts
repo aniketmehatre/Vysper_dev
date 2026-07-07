@@ -1,18 +1,17 @@
 import { ipcMain } from 'electron';
-import { IPC_EVENTS } from '../../../shared/ipc-events';
+import { OcrService } from '../services/ocr.service';
 
-export function registerOcrHandlers(): void {
-  ipcMain.handle(IPC_EVENTS.OCR_PROCESS_IMAGE, async (event, imagePath: string) => {
+/**
+ * Maps program-triggered character recognition calls to the host OcrService.
+ */
+export function registerOcrHandlers(ocrService: OcrService): void {
+  ipcMain.handle('ocr:process-image', async (event, imageBuffer: string) => {
     try {
-      console.log('[Electron OCR Handler] Processing path:', imagePath);
-      return {
-        text: 'Mock OCR text results',
-        confidence: 0.98,
-        boundingBoxes: []
-      };
+      console.log('[OcrHandler] Invoking programmatic character extraction...');
+      return await ocrService.extractText(imageBuffer);
     } catch (error) {
-      console.error('Error in OCR IPC handler:', error);
-      throw new Error('OCR image scanning failed');
+      console.error('[OcrHandler] Error in ocr:process-image IPC channel:', error);
+      throw new Error('OCR character recognition failed.');
     }
   });
 }

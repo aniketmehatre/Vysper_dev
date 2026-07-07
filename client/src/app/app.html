@@ -11,20 +11,12 @@
     <div class="system-status">
       @if (electron.isElectron()) {
         <span class="status-dot"></span>
-        <span>Desktop Host Active (v{{ electron.appVersion() }})</span>
+        <span>Desktop Host Active</span>
       } @else {
         <span class="status-dot offline"></span>
         <span>Web Sandbox Mode</span>
       }
     </div>
-
-    @if (electron.isElectron()) {
-      <div class="window-controls">
-        <button class="win-btn" (click)="electron.minimize()" aria-label="Minimize">─</button>
-        <button class="win-btn" (click)="electron.maximize()" aria-label="Maximize">⛶</button>
-        <button class="win-btn close-btn" (click)="electron.close()" aria-label="Close">✕</button>
-      </div>
-    }
   </header>
 
   <!-- Workspace Layout -->
@@ -65,6 +57,122 @@
         </p>
       </section>
 
+      <!-- System IPC Diagnostics Panel -->
+      <section class="ipc-verification-panel">
+        <h2 class="section-title" style="font-size: 1.3rem; font-weight: 700; margin-bottom: 16px; background: var(--accent-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">System Diagnostics & OCR Pipeline</h2>
+        
+        <div class="features-grid" style="margin-bottom: 24px;">
+          <!-- Get Version -->
+          <div class="feature-card verify-card" (click)="fetchVersion()">
+            <div class="card-icon">🏷️</div>
+            <h3 class="card-title">Get Version</h3>
+            <p class="card-desc">Click to invoke system:get-version</p>
+            <div class="result-box">
+              {{ versionResult() || 'Pending click...' }}
+            </div>
+          </div>
+
+          <!-- Get Platform -->
+          <div class="feature-card verify-card" (click)="fetchPlatform()">
+            <div class="card-icon">💻</div>
+            <h3 class="card-title">Get Platform</h3>
+            <p class="card-desc">Click to invoke system:get-platform</p>
+            <div class="result-box">
+              {{ platformResult() || 'Pending click...' }}
+            </div>
+          </div>
+
+          <!-- Get OS -->
+          <div class="feature-card verify-card" (click)="fetchOS()">
+            <div class="card-icon">🎛️</div>
+            <h3 class="card-title">Get OS</h3>
+            <p class="card-desc">Click to invoke system:get-os</p>
+            <div class="result-box">
+              {{ osResult() || 'Pending click...' }}
+            </div>
+          </div>
+
+          <!-- Manual Capture Trigger -->
+          <div class="feature-card verify-card" (click)="triggerManualCapture()">
+            <div class="card-icon">📸</div>
+            <h3 class="card-title">Capture & OCR</h3>
+            <p class="card-desc">Click to invoke capture & OCR pipeline</p>
+            <div class="result-box">
+              {{ electron.latestScreenshot() ? 'Buffer Active' : 'Pending click...' }}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Captured Screen State Display & OCR Outcomes -->
+      @if (electron.latestScreenshot()) {
+        <section class="screenshot-display-panel" style="margin-bottom: 32px;">
+          <div class="screenshot-info-card">
+            <div class="diagnostics-split">
+              <!-- Left side: Screenshot info -->
+              <div class="screenshot-metadata-section">
+                <div class="status-header">
+                  <span class="check-mark">✔</span>
+                  <span>Screenshot Captured</span>
+                </div>
+                
+                <div class="meta-content">
+                  <div class="meta-row">
+                    <span class="meta-label">Resolution:</span>
+                    <span class="meta-val">{{ electron.latestScreenshot()?.width }} x {{ electron.latestScreenshot()?.height }} px</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">Captured At:</span>
+                    <span class="meta-val">{{ electron.latestScreenshot()?.timestamp | date:'mediumTime' }}</span>
+                  </div>
+                  <div class="meta-row">
+                    <span class="meta-label">Primary monitor:</span>
+                    <span class="meta-val">{{ electron.latestScreenshot()?.isPrimary ? 'Yes' : 'No' }}</span>
+                  </div>
+                </div>
+
+                <div class="image-preview-container">
+                  <img [src]="electron.latestScreenshot()?.imageBuffer" alt="Screen Capture" class="screenshot-preview" />
+                </div>
+              </div>
+
+              <!-- Right side: OCR outcomes -->
+              <div class="ocr-results-section">
+                @if (electron.latestOcrResult()) {
+                  <div class="status-header ocr-active">
+                    <span class="check-mark">✔</span>
+                    <span>OCR Completed</span>
+                  </div>
+                  
+                  <div class="meta-content">
+                    <div class="meta-row">
+                      <span class="meta-label">Processing Time:</span>
+                      <span class="meta-val">{{ electron.latestOcrResult()?.processingTimeMs }} ms</span>
+                    </div>
+                    <div class="meta-row">
+                      <span class="meta-label">Confidence:</span>
+                      <span class="meta-val">{{ (electron.latestOcrResult()?.confidence || 0) * 100 }}%</span>
+                    </div>
+                  </div>
+
+                  <div class="extracted-text-box">
+                    <div class="box-header">Extracted Text:</div>
+                    <pre class="raw-text">{{ electron.latestOcrResult()?.text }}</pre>
+                  </div>
+                } @else {
+                  <div class="status-header ocr-pending">
+                    <span class="status-dot offline"></span>
+                    <span>OCR Parser Idle</span>
+                  </div>
+                  <p class="card-desc" style="margin-top: 8px;">Trigger global shortcut Ctrl + Shift + Space or Click Manual Capture to scan screen viewports.</p>
+                }
+              </div>
+            </div>
+          </div>
+        </section>
+      }
+
+      <!-- Feature Placeholders -->
       <section class="features-grid">
         <div class="feature-card">
           <div class="card-icon">🤖</div>
@@ -93,3 +201,11 @@
     </main>
   </div>
 </div>
+
+<!-- Floating Toast Notification -->
+@if (electron.shortcutNotification()) {
+  <div class="toast-notification">
+    <span class="toast-icon">⚡</span>
+    <span class="toast-message">{{ electron.shortcutNotification() }}</span>
+  </div>
+}

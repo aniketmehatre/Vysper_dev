@@ -1,13 +1,17 @@
 import { ipcMain } from 'electron';
+import { ScreenshotService } from '../services/screenshot.service';
 
-export function registerScreenshotHandlers(): void {
+/**
+ * Maps program-triggered screen captures to the host ScreenshotService.
+ */
+export function registerScreenshotHandlers(screenshotService: ScreenshotService): void {
   ipcMain.handle('screenshot:capture', async () => {
     try {
-      console.log('[Electron Screenshot Handler] Capturing screen...');
-      return { success: true, imageBuffer: null };
+      console.log('[ScreenshotHandler] Invoking programmatic screen capture...');
+      return await screenshotService.captureAllScreens();
     } catch (error) {
-      console.error('Error in Screenshot IPC handler:', error);
-      throw new Error('Screen capture failed');
+      console.error('[ScreenshotHandler] Error during programmatic capture invocation:', error);
+      throw new Error('Screenshot capture operation failed.');
     }
   });
 }

@@ -1,9 +1,13 @@
 import { app, BrowserWindow } from 'electron';
 import * as path from 'path';
 import { registerIpcHandlers } from './ipc';
+import { ShortcutService } from './services/shortcut.service';
 
 let mainWindow: BrowserWindow | null = null;
 const isDev = !app.isPackaged;
+
+// Instantiate global shortcut service
+const shortcutService = new ShortcutService();
 
 function createWindow(): void {
   mainWindow = new BrowserWindow({
@@ -15,7 +19,7 @@ function createWindow(): void {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
       nodeIntegration: false,
-      sandbox: true // Enforces Chromium sandbox on the renderer process
+      sandbox: true
     },
     frame: true
   });
@@ -24,7 +28,6 @@ function createWindow(): void {
     mainWindow.loadURL('http://localhost:4200');
     mainWindow.webContents.openDevTools();
   } else {
-    // Angular 20 output path is client/dist/client/browser
     const appPath = path.join(__dirname, '../../client/dist/client/browser/index.html');
     mainWindow.loadFile(appPath);
   }
@@ -46,8 +49,8 @@ if (!gotTheLock) {
   });
 
   app.whenReady().then(() => {
-    // Initialize modular IPC handlers
-    registerIpcHandlers();
+    // Initialize modular IPC handlers passing shortcuts controllers
+    registerIpcHandlers(shortcutService, () => mainWindow);
     createWindow();
 
     app.on('activate', () => {
@@ -57,6 +60,11 @@ if (!gotTheLock) {
     });
   });
 }
+
+// Cleanly unregister native shortcuts on quit
+app.on('will-quit', () => {
+  shortcutService.unregisterAll();
+});
 
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
