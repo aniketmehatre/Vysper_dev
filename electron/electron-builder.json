@@ -1,0 +1,28 @@
+{
+  "appId": "com.aiprod.copilot",
+  "productName": "AI Productivity Copilot",
+  "directories": {
+    "output": "../dist/installer"
+  },
+  "files": [
+    "../dist/electron/**/*",
+    "../client/dist/client/**/*",
+    "../package.json"
+  ],
+  "win": {
+    "target": [
+      {
+        "target": "nsis",
+        "arch": ["x64"]
+      }
+    ],
+    "icon": "../assets/icon.png"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "shortcutName": "AI Productivity Copilot"
+  }
+}

@@ -1,0 +1,95 @@
+<div class="app-container">
+  <!-- Top App Titlebar -->
+  <header class="window-header">
+    <div class="brand-section">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/>
+      </svg>
+      <span>AI Productivity Copilot</span>
+    </div>
+    
+    <div class="system-status">
+      @if (electron.isElectron()) {
+        <span class="status-dot"></span>
+        <span>Desktop Host Active (v{{ electron.appVersion() }})</span>
+      } @else {
+        <span class="status-dot offline"></span>
+        <span>Web Sandbox Mode</span>
+      }
+    </div>
+
+    @if (electron.isElectron()) {
+      <div class="window-controls">
+        <button class="win-btn" (click)="electron.minimize()" aria-label="Minimize">─</button>
+        <button class="win-btn" (click)="electron.maximize()" aria-label="Maximize">⛶</button>
+        <button class="win-btn close-btn" (click)="electron.close()" aria-label="Close">✕</button>
+      </div>
+    }
+  </header>
+
+  <!-- Workspace Layout -->
+  <div class="workspace-layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+      <nav class="nav-links">
+        <a class="nav-item active">
+          <span>🧠</span>
+          <span>Copilot Chat</span>
+        </a>
+        <a class="nav-item">
+          <span>👁️</span>
+          <span>OCR Scanner</span>
+        </a>
+        <a class="nav-item">
+          <span>🎙️</span>
+          <span>Voice Recorder</span>
+        </a>
+        <a class="nav-item">
+          <span>📁</span>
+          <span>Local Library</span>
+        </a>
+      </nav>
+
+      <div class="footer-section">
+        <div>Environment: {{ electron.isElectron() ? 'Windows Desktop' : 'Web Browser' }}</div>
+        <div style="margin-top: 4px;">Node.js API: Connected</div>
+      </div>
+    </aside>
+
+    <!-- Main Workspace Content -->
+    <main class="main-content">
+      <section class="welcome-hero">
+        <h1 class="hero-title">Welcome to AI Productivity Copilot</h1>
+        <p class="hero-subtitle">
+          Your offline-first, local-native desktop companion. Powered by Electron and Angular 20 Standalone Architecture.
+        </p>
+      </section>
+
+      <section class="features-grid">
+        <div class="feature-card">
+          <div class="card-icon">🤖</div>
+          <h3 class="card-title">Local LLM Chat</h3>
+          <p class="card-desc">Interact with local Ollama or cloud models (Gemini, OpenAI) securely from your desktop.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="card-icon">📄</div>
+          <h3 class="card-title">Desktop OCR</h3>
+          <p class="card-desc">Extract text and metadata from documents and screenshots using optical recognition.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="card-icon">🎤</div>
+          <h3 class="card-title">Speech-to-Text</h3>
+          <p class="card-desc">Transcribe offline audio recordings and dictate notes with local speech models.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="card-icon">🗄️</div>
+          <h3 class="card-title">SQLite Storage</h3>
+          <p class="card-desc">All logs, history, and workspace configuration stored in a lightweight native database.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>

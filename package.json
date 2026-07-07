@@ -1,0 +1,26 @@
+{
+  "name": "ai-productivity-copilot",
+  "version": "1.0.0",
+  "description": "AI Productivity Copilot for Windows",
+  "main": "dist/electron/src/main.js",
+  "scripts": {
+    "postinstall": "cd client && npm install",
+    "client:dev": "cd client && npm run start",
+    "client:build": "cd client && npm run build",
+    "electron:compile": "tsc -p electron",
+    "electron:watch": "tsc -w -p electron",
+    "dev": "npm run electron:compile && concurrently -k -n \"Angular,Electron\" -c \"blue,green\" \"npm run client:dev\" \"wait-on http://localhost:4200 && electron .\"",
+    "build": "npm run client:build && npm run electron:compile",
+    "package": "npm run build && electron-builder --win"
+  },
+  "dependencies": {
+    "sqlite3": "^5.1.7"
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2",
+    "electron": "^31.0.0",
+    "electron-builder": "^24.13.3",
+    "typescript": "^5.4.5",
+    "wait-on": "^7.2.0"
+  }
+}
